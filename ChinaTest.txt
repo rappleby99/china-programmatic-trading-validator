@@ -1,0 +1,731 @@
+import re
+import sys
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import Optional, Callable
+from enum import Enum
+
+
+class Severity(Enum):
+    ERROR = "ERROR"
+    WARNING = "WARNING"
+
+
+@dataclass
+class ValidationError:
+    row_num: int
+    field_name: str
+    field_value: str
+    message: str
+    severity: Severity = Severity.ERROR
+    account_name: str = ""
+    client_code: str = ""
+
+    def __str__(self):
+        context = ""
+        if self.account_name or self.client_code:
+            parts = []
+            if self.account_name:
+                parts.append(f"Account: {self.account_name}")
+            if self.client_code:
+                parts.append(f"BCAN: {self.client_code}")
+            context = f" [{', '.join(parts)}]"
+        return f"[{self.severity.value}] Row {self.row_num}{context}, '{self.field_name}': {self.message} (value: '{self.field_value}')"
+
+
+@dataclass
+class RowValidationResult:
+    """Result of validating a single row"""
+    row_num: int
+    account_name: str
+    client_code: str
+    is_valid: bool
+    error_count: int = 0
+    warning_count: int = 0
+
+
+@dataclass
+class FieldSpec:
+    """Specification for a single field"""
+    index: int
+    name_cn: str
+    name_en: str
+    max_length: int
+    required: bool = False  # Always required
+    conditional_required: Optional[Callable] = None  # Conditionally required
+    valid_values: Optional[list] = None  # Enumerated values (Chinese)
+    multi_value: bool = False  # Can contain multiple values separated by ;
+    max_multi_count: Optional[int] = None  # Maximum number of values if multi
+    validator: Optional[Callable] = None  # Custom validation function
+    description: str = ""
+
+
+class SSEValidator:
+    """Validator for SSE Programmatic Trading Reports"""
+
+    # Enumerated values (must be in Chinese)
+    REPORT_TYPES = ["首次", "变更", "停止使用"]
+    YES_NO = ["是", "否"]
+    YES_NO_EXEMPT = ["是", "否", "已申请豁免"]
+    FUND_SOURCES = ["自有资金", "募集资金", "杠杆资金", "其他"]
+    LEVERAGE_SOURCES = ["融资融券", "场外衍生品", "其他"]
+    TRADING_PRODUCTS = ["股票", "基金"]
+    STRATEGY_TYPES = [
+        "指数增强策略", "市场中性策略", "多空灵活策略", "量化多头策略",
+        "管理期货策略CTA", "参与新股发行策略", "量化套利策略", "日内回转策略", "其他"
+    ]
+    EXECUTION_METHODS = ["TWAP", "VWAP", "POV", "其他"]
+    ORDER_RATES = ["500笔及以上", "300笔至499笔", "100笔至299笔", "100笔以下"]
+    DAILY_ORDER_COUNTS = [
+        "25000笔及以上", "20000笔至24999笔", "15000笔至19999笔",
+        "10000笔至14999笔", "10000笔以下"
+    ]
+
+    # High frequency thresholds
+    HIGH_FREQ_RATES = ["500笔及以上", "300笔至499笔"]
+    HIGH_FREQ_DAILY = ["25000笔及以上", "20000笔至24999笔"]
+
+    # Special value for consolidated reporting
+    REPORTED_ELSEWHERE = "已在其他联交所参与者报告"
+    EXEMPT_VALUE = "已申请豁免"
+
+    def __init__(self):
+        self.errors: list[ValidationError] = []
+        self.row_results: list[RowValidationResult] = []
+        self.field_specs = self._build_field_specs()
+        self.header_row = None
+        self.current_row_context = {"account_name": "", "client_code": ""}
+
+    def _build_field_specs(self) -> dict[int, FieldSpec]:
+        """Build field specifications based on SSE requirements"""
+        specs = {}
+
+        # Helper functions for conditional requirements
+        def req_if_first_or_change(row):
+            return row.get(7, "") in ["首次", "变更"]
+
+        def req_if_fund_source_other(row):
+            return "其他" in row.get(11, "")
+
+        def req_if_has_leverage(row):
+            return "杠杆资金" in row.get(11, "")
+
+        def req_if_leverage_source_other(row):
+            return "其他" in row.get(15, "")
+
+        def req_if_quantitative(row):
+            return row.get(19, "") == "是"
+
+        def req_if_main_strategy_other(row):
+            return row.get(20, "") == "其他"
+
+        def req_if_main_strategy_filled(row):
+            return bool(row.get(20, "").strip())
+
+        def req_if_sub_strategy_other(row):
+            return "其他" in row.get(23, "")
+
+        def req_if_sub_strategy_filled(row):
+            return bool(row.get(23, "").strip())
+
+        def req_if_execution_other(row):
+            return "其他" in row.get(28, "")
+
+        def req_if_high_freq_no_exempt(row):
+            rate = row.get(31, "")
+            daily = row.get(32, "")
+            is_high_freq = rate in self.HIGH_FREQ_RATES or daily in self.HIGH_FREQ_DAILY
+            is_exempt = row.get(40, "") == "已申请豁免"
+            return is_high_freq and not is_exempt and req_if_first_or_change(row)
+
+        def req_if_qfii_exemption(row):
+            """QFII code required when using order-splitting exemption for high-freq reporting"""
+            rate = row.get(31, "")
+            daily = row.get(32, "")
+            is_high_freq = rate in self.HIGH_FREQ_RATES or daily in self.HIGH_FREQ_DAILY
+            upload_report = row.get(40, "")
+            # Required if high-freq but not uploading report (implying order-splitting exemption)
+            # Based on Excel comment: QFII investors using order-splitting to avoid high-freq extra reporting
+            return is_high_freq and upload_report == "否" and req_if_first_or_change(row)
+
+        # Field definitions (0-indexed to match CSV columns after header)
+        field_defs = [
+            # Basic Information (基本信息)
+            (0, "联交所参与者名称", "ep_name", 100, True, None, None, False, None),
+            (1, "经纪商代码", "broker_code", 5, True, None, None, False, None),
+            (2, "账户名称", "account_name", 200, True, None, None, False, None),
+            (3, "证件号码", "id_number", 80, False, req_if_first_or_change, None, False, None),
+            (4, "产品编码（选填）", "product_code", 50, False, None, None, False, None),
+            (5, "券商客户编码", "client_code", 10, True, None, None, False, None),
+            (6, "产品管理机构名称", "fund_manager", 200, False, None, None, False, None),
+            (7, "报告类型", "report_type", 6, True, None, self.REPORT_TYPES, False, None),
+            (8, "报告日期", "report_date", 8, True, None, None, False, None),
+
+            # Fund Information (资金信息)
+            (9, "是否选取一家联交所参与者集中填报资金信息", "consolidated_reporting", 1, False, req_if_first_or_change, self.YES_NO, False, None),
+            (10, "账户资金规模（人民币，万元）", "fund_size", 30, False, req_if_first_or_change, None, False, None),
+            (11, "账户资金来源", "fund_sources", 30, False, req_if_first_or_change, self.FUND_SOURCES, True, None),
+            (12, "其他资金来源描述", "other_fund_desc", 200, False, req_if_fund_source_other, None, False, None),
+            (13, "资金来源占比", "fund_source_ratio", 50, False, req_if_first_or_change, None, False, None),
+            (14, "杠杆资金规模（人民币，万元）", "leverage_size", 30, False, req_if_first_or_change, None, False, None),
+            (15, "杠杆资金来源", "leverage_sources", 30, False, req_if_has_leverage, self.LEVERAGE_SOURCES, True, None),
+            (16, "其他杠杆资金来源描述", "other_leverage_desc", 200, False, req_if_leverage_source_other, None, False, None),
+            (17, "杠杆率（%）", "leverage_ratio", 20, False, req_if_first_or_change, None, False, None),
+
+            # Trading Information (交易信息)
+            (18, "交易品种", "trading_products", 20, False, req_if_first_or_change, self.TRADING_PRODUCTS, True, None),
+            (19, "是否量化交易", "is_quantitative", 1, False, req_if_first_or_change, self.YES_NO, False, None),
+            (20, "主策略类型", "main_strategy", 20, False, req_if_quantitative, self.STRATEGY_TYPES, False, None),
+            (21, "其他主策略类型", "other_main_strategy", 200, False, req_if_main_strategy_other, None, False, None),
+            (22, "主策略概述", "main_strategy_desc", 500, False, req_if_main_strategy_filled, None, False, None),
+            (23, "辅策略类型", "sub_strategy", 50, False, None, self.STRATEGY_TYPES, True, 2),
+            (24, "其他辅策略类型", "other_sub_strategy", 200, False, req_if_sub_strategy_other, None, False, None),
+            (25, "辅策略概述", "sub_strategy_desc", 500, False, req_if_sub_strategy_filled, None, False, None),
+            (26, "期货市场账户名称（选填）", "futures_account_name", 200, False, None, None, True, None),
+            (27, "期货市场账户代码（选填）", "futures_account_code", 300, False, None, None, True, None),
+            (28, "交易指令执行方式", "execution_method", 50, False, req_if_first_or_change, self.EXECUTION_METHODS, True, None),
+            (29, "其他方式描述", "other_execution_desc", 500, False, req_if_execution_other, None, False, None),
+            (30, "指令执行方式概述", "execution_desc", 500, False, req_if_first_or_change, None, False, None),
+            (31, "账户最高申报速率", "max_order_rate", 20, False, req_if_first_or_change, self.ORDER_RATES, False, None),
+            (32, "账户单日最高申报笔数", "max_daily_orders", 20, False, req_if_first_or_change, self.DAILY_ORDER_COUNTS, False, None),
+
+            # Software Information (交易软件信息)
+            (33, "程序化交易软件名称及版本号", "software_name", 200, False, req_if_first_or_change, None, True, None),
+            (34, "程序化交易软件开发主体", "software_developer", 200, False, req_if_first_or_change, None, True, None),
+
+            # Other Information (其他)
+            (35, "高频交易系统服务器所在地", "hft_server_location", 100, False, req_if_high_freq_no_exempt, None, False, None),
+            (36, "联交所参与者联络人（选填）", "ep_contact", 80, False, None, None, False, None),
+            (37, "联交所参与者联络人联系方式（选填）", "ep_contact_info", 80, False, None, None, False, None),
+            (38, "投资者相关业务负责人（选填）", "investor_contact", 80, False, None, None, False, None),
+            (39, "投资者相关业务负责人联系方式（选填）", "investor_contact_info", 80, False, None, None, False, None),
+            (40, "是否上传测试报告及应急方案", "upload_test_report", 5, False, req_if_first_or_change, self.YES_NO_EXEMPT, False, None),
+            (41, "合格境外投资者编码", "qfii_code", 50, False, req_if_qfii_exemption, None, False, None),
+        ]
+
+        for idx, name_cn, name_en, max_len, required, cond_req, valid_vals, multi, max_multi in field_defs:
+            specs[idx] = FieldSpec(
+                index=idx,
+                name_cn=name_cn,
+                name_en=name_en,
+                max_length=max_len,
+                required=required,
+                conditional_required=cond_req,
+                valid_values=valid_vals,
+                multi_value=multi,
+                max_multi_count=max_multi
+            )
+
+        return specs
+
+    def add_error(self, row_num: int, field_name: str, value: str, message: str, severity: Severity = Severity.ERROR):
+        """Add a validation error with row context"""
+        self.errors.append(ValidationError(
+            row_num, field_name, value, message, severity,
+            self.current_row_context.get("account_name", ""),
+            self.current_row_context.get("client_code", "")
+        ))
+
+    def validate_broker_code(self, row_num: int, value: str) -> bool:
+        """Validate broker code is exactly 5 digits"""
+        if not value:
+            return True  # Handled by required check
+        if not re.match(r'^\d{5}$', value):
+            self.add_error(row_num, "经纪商代码", value, "Must be exactly 5 digits")
+            return False
+        return True
+
+    def validate_client_code(self, row_num: int, value: str) -> bool:
+        """Validate client code is 3-10 characters"""
+        if not value:
+            return True
+        if len(value) < 3 or len(value) > 10:
+            self.add_error(row_num, "券商客户编码", value, "Must be 3-10 characters")
+            return False
+        return True
+
+    def validate_date(self, row_num: int, value: str) -> bool:
+        """Validate date format YYYYMMDD and ensure not in future"""
+        if not value:
+            return True
+        if not re.match(r'^\d{8}$', value):
+            self.add_error(row_num, "报告日期", value, "Must be in YYYYMMDD format")
+            return False
+        try:
+            report_date = datetime.strptime(value, '%Y%m%d')
+            # Check that report date is not in the future
+            current_date = datetime.now()
+            if report_date > current_date:
+                self.add_error(row_num, "报告日期", value,
+                              f"Report date cannot be later than current date ({current_date.strftime('%Y%m%d')})")
+                return False
+        except ValueError:
+            self.add_error(row_num, "报告日期", value, "Invalid date")
+            return False
+        return True
+
+    def validate_numeric(self, row_num: int, field_name: str, value: str, allow_negative: bool = False) -> bool:
+        """Validate numeric field (allows up to 2 decimal places)"""
+        if not value or value == self.REPORTED_ELSEWHERE:
+            return True
+        try:
+            num = float(value)
+            if not allow_negative and num < 0:
+                self.add_error(row_num, field_name, value, "Must be non-negative")
+                return False
+            # Check decimal places
+            if '.' in value:
+                decimals = len(value.split('.')[1])
+                if decimals > 2:
+                    self.add_error(row_num, field_name, value, "Maximum 2 decimal places allowed")
+                    return False
+        except ValueError:
+            self.add_error(row_num, field_name, value, "Must be a valid number")
+            return False
+        return True
+
+    def validate_leverage_ratio(self, row_num: int, value: str, has_leverage: bool) -> bool:
+        """Validate leverage ratio"""
+        if not value or value == self.REPORTED_ELSEWHERE:
+            return True
+        try:
+            ratio = float(value)
+            if ratio < 100:
+                self.add_error(row_num, "杠杆率（%）", value, "Must be >= 100 (leverage ratio cannot be less than 100%)")
+                return False
+            if not has_leverage and ratio != 100:
+                self.add_error(row_num, "杠杆率（%）", value, "Must be 100 when no leverage funds")
+                return False
+            if has_leverage and ratio <= 100:
+                self.add_error(row_num, "杠杆率（%）", value, "Must be > 100 when leverage funds exist")
+                return False
+        except ValueError:
+            self.add_error(row_num, "杠杆率（%）", value, "Must be a valid number")
+            return False
+        return True
+
+    def validate_fund_source_ratio(self, row_num: int, ratio_value: str, sources_value: str) -> bool:
+        """Validate fund source ratio matches sources and sums to 100%"""
+        if not ratio_value or ratio_value == self.REPORTED_ELSEWHERE:
+            return True
+        if not sources_value or sources_value == self.REPORTED_ELSEWHERE:
+            return True
+
+        # Parse sources
+        sources = [s.strip() for s in sources_value.split(';') if s.strip()]
+
+        # Parse ratios (format: "自有资金80%;募集资金20%")
+        ratio_pattern = r'([^;]+?)(\d+(?:\.\d+)?)\s*%'
+        matches = re.findall(ratio_pattern, ratio_value)
+
+        if not matches:
+            self.add_error(row_num, "资金来源占比", ratio_value,
+                          "Invalid format. Expected: '来源1XX%;来源2XX%'")
+            return False
+
+        ratio_sources = []
+        total = 0
+        for source, pct in matches:
+            source = source.strip()
+            ratio_sources.append(source)
+            total += float(pct)
+
+        # Check sources match
+        for src in sources:
+            if src not in ratio_sources:
+                self.add_error(row_num, "资金来源占比", ratio_value,
+                              f"Missing ratio for source: {src}")
+                return False
+
+        # Check total is 100%
+        if abs(total - 100) > 0.01:
+            self.add_error(row_num, "资金来源占比", ratio_value,
+                          f"Ratios must sum to 100% (current: {total}%)")
+            return False
+
+        return True
+
+    def validate_leverage_funds(self, row_num: int, leverage_size: str, fund_size: str, has_leverage: bool) -> bool:
+        """Validate leverage fund size is consistent"""
+        if leverage_size == self.REPORTED_ELSEWHERE or fund_size == self.REPORTED_ELSEWHERE:
+            return True
+
+        try:
+            lev_val = float(leverage_size) if leverage_size else 0
+            fund_val = float(fund_size) if fund_size else 0
+
+            if not has_leverage and lev_val != 0:
+                self.add_error(row_num, "杠杆资金规模（人民币，万元）", leverage_size,
+                              "Must be 0 when leverage not in fund sources")
+                return False
+
+            if has_leverage and lev_val <= 0:
+                self.add_error(row_num, "杠杆资金规模（人民币，万元）", leverage_size,
+                              "Must be > 0 when leverage is in fund sources")
+                return False
+
+            if lev_val > fund_val and fund_val > 0:
+                self.add_error(row_num, "杠杆资金规模（人民币，万元）", leverage_size,
+                              f"Cannot exceed total fund size ({fund_size})")
+                return False
+
+        except ValueError:
+            pass  # Handled by numeric validation
+
+        return True
+
+    def validate_multi_value_field(self, row_num: int, field_spec: FieldSpec, value: str) -> bool:
+        """Validate multi-value fields (with or without enumerated values)"""
+        if not value or value == self.REPORTED_ELSEWHERE:
+            return True
+
+        values = [v.strip() for v in value.split(';') if v.strip()]
+
+        # Check for duplicates
+        if len(values) != len(set(values)):
+            self.add_error(row_num, field_spec.name_cn, value, "Duplicate values not allowed")
+            return False
+
+        # Check max count
+        if field_spec.max_multi_count and len(values) > field_spec.max_multi_count:
+            self.add_error(row_num, field_spec.name_cn, value,
+                          f"Maximum {field_spec.max_multi_count} values allowed")
+            return False
+
+        # Check each value is valid (only if field has enumerated values)
+        if field_spec.valid_values:
+            for v in values:
+                if v not in field_spec.valid_values:
+                    self.add_error(row_num, field_spec.name_cn, value,
+                                  f"Invalid value '{v}'. Must be one of: {', '.join(field_spec.valid_values)}")
+                    return False
+
+        # Check for whitespace in values
+        for v in values:
+            if v != v.strip() or '  ' in v:
+                self.add_error(row_num, field_spec.name_cn, value,
+                              "Values must not contain leading/trailing spaces or line breaks")
+                return False
+
+        return True
+
+    def validate_high_freq_requirements(self, row_num: int, row: dict) -> bool:
+        """Validate high-frequency trading requirements"""
+        rate = row.get(31, "")
+        daily = row.get(32, "")
+        server_location = row.get(35, "")
+        upload_report = row.get(40, "")
+
+        is_high_freq = rate in self.HIGH_FREQ_RATES or daily in self.HIGH_FREQ_DAILY
+
+        if is_high_freq:
+            if upload_report == "否":
+                self.add_error(row_num, "是否上传测试报告及应急方案", upload_report,
+                              "High-frequency accounts must upload test report or apply for exemption")
+                return False
+
+            if upload_report == "是" and not server_location:
+                self.add_error(row_num, "高频交易系统服务器所在地", server_location,
+                              "Required for high-frequency trading accounts", Severity.WARNING)
+
+            if upload_report == "已申请豁免" and server_location and server_location != "已申请豁免":
+                self.add_error(row_num, "高频交易系统服务器所在地", server_location,
+                              "Should be '已申请豁免' when applying for exemption", Severity.WARNING)
+
+        return True
+
+    def validate_row(self, row_num: int, row_data: list) -> bool:
+        """Validate a single row of data"""
+        # Build row dict for easier access
+        row = {i: (row_data[i].strip() if i < len(row_data) else "") for i in range(42)}
+
+        # Set current row context for error messages (Column C = index 2, Column F = index 5)
+        self.current_row_context = {
+            "account_name": row.get(2, ""),  # 账户名称 - Column C
+            "client_code": row.get(5, "")     # 券商客户编码 - Column F (BCAN)
+        }
+
+        valid = True
+        report_type = row.get(7, "")
+        is_stop = report_type == "停止使用"
+
+        # For "停止使用", only basic fields required
+        if is_stop:
+            required_fields = [0, 1, 2, 5, 8]  # EP name, broker code, account name, client code, date
+            for idx in required_fields:
+                spec = self.field_specs.get(idx)
+                if spec and not row.get(idx, ""):
+                    self.add_error(row_num, spec.name_cn, "", "Required field")
+                    valid = False
+            return valid
+
+        # Validate each field
+        for idx, spec in self.field_specs.items():
+            value = row.get(idx, "")
+
+            # Check length
+            if value and len(value) > spec.max_length:
+                self.add_error(row_num, spec.name_cn, value[:50] + "...",
+                              f"Exceeds maximum length of {spec.max_length}")
+                valid = False
+
+            # Check required
+            is_required = spec.required
+            if spec.conditional_required:
+                is_required = is_required or spec.conditional_required(row)
+
+            if is_required and not value:
+                self.add_error(row_num, spec.name_cn, "", "Required field")
+                valid = False
+                continue
+
+            # Skip further validation if empty
+            if not value:
+                continue
+
+            # Check multi-value fields
+            if spec.multi_value:
+                if not self.validate_multi_value_field(row_num, spec, value):
+                    valid = False
+            # Check enumerated values (for non-multi-value fields)
+            elif spec.valid_values:
+                if value not in spec.valid_values and value != self.REPORTED_ELSEWHERE:
+                    self.add_error(row_num, spec.name_cn, value,
+                                  f"Must be one of: {', '.join(spec.valid_values)}")
+                    valid = False
+
+        # Field-specific validations
+        if not self.validate_broker_code(row_num, row.get(1, "")):
+            valid = False
+
+        if not self.validate_client_code(row_num, row.get(5, "")):
+            valid = False
+
+        if not self.validate_date(row_num, row.get(8, "")):
+            valid = False
+
+        # Numeric validations
+        if not self.validate_numeric(row_num, "账户资金规模（人民币，万元）", row.get(10, "")):
+            valid = False
+
+        if not self.validate_numeric(row_num, "杠杆资金规模（人民币，万元）", row.get(14, "")):
+            valid = False
+
+        # Leverage-related validations
+        has_leverage = "杠杆资金" in row.get(11, "")
+
+        if not self.validate_leverage_ratio(row_num, row.get(17, ""), has_leverage):
+            valid = False
+
+        if not self.validate_leverage_funds(row_num, row.get(14, ""), row.get(10, ""), has_leverage):
+            valid = False
+
+        # Fund source ratio validation
+        if not self.validate_fund_source_ratio(row_num, row.get(13, ""), row.get(11, "")):
+            valid = False
+
+        # High-frequency trading validations
+        if not self.validate_high_freq_requirements(row_num, row):
+            valid = False
+
+        return valid
+
+    def validate_file(self, file_path: str) -> tuple[bool, list[ValidationError]]:
+        """Validate an entire Excel file"""
+        self.errors = []
+        path = Path(file_path)
+
+        if not path.exists():
+            self.add_error(0, "File", str(file_path), "File not found")
+            return False, self.errors
+
+        # Only support Excel files
+        if path.suffix.lower() != '.xlsx':
+            self.add_error(0, "File", str(file_path), "Only Excel files (.xlsx) are supported")
+            return False, self.errors
+
+        # Read Excel data
+        rows = self._read_xlsx(file_path)
+
+        if not rows:
+            self.add_error(0, "File", str(file_path), "No data rows found")
+            return False, self.errors
+
+        # Track client codes for duplicate check
+        client_codes = {}
+
+        # Validate each row
+        for row_num, row_data in enumerate(rows, start=1):
+            # Track errors before validation
+            errors_before = len([e for e in self.errors if e.severity == Severity.ERROR and e.row_num == row_num])
+            warnings_before = len([e for e in self.errors if e.severity == Severity.WARNING and e.row_num == row_num])
+
+            self.validate_row(row_num, row_data)
+
+            # Check for duplicate client codes
+            if len(row_data) > 5:
+                client_code = row_data[5].strip() if row_data[5] else ""
+                if client_code:
+                    if client_code in client_codes:
+                        self.add_error(row_num, "券商客户编码", client_code,
+                                      f"Duplicate client code (first occurrence: row {client_codes[client_code]})")
+                    else:
+                        client_codes[client_code] = row_num
+
+            # Track errors after validation
+            errors_after = len([e for e in self.errors if e.severity == Severity.ERROR and e.row_num == row_num])
+            warnings_after = len([e for e in self.errors if e.severity == Severity.WARNING and e.row_num == row_num])
+
+            # Record row result
+            account_name = row_data[2].strip() if len(row_data) > 2 else ""
+            client_code = row_data[5].strip() if len(row_data) > 5 else ""
+            error_count = errors_after - errors_before
+            warning_count = warnings_after - warnings_before
+
+            self.row_results.append(RowValidationResult(
+                row_num=row_num,
+                account_name=account_name,
+                client_code=client_code,
+                is_valid=(error_count == 0),
+                error_count=error_count,
+                warning_count=warning_count
+            ))
+
+        return len([e for e in self.errors if e.severity == Severity.ERROR]) == 0, self.errors
+
+    def _read_xlsx(self, file_path: str) -> list[list[str]]:
+        """Read data from Excel file, skipping any instructional text above the header"""
+        try:
+            from openpyxl import load_workbook
+            wb = load_workbook(file_path, data_only=True)
+            ws = wb.active
+
+            # Find header row (look for "联交所参与者名称")
+            # Search up to row 30 to handle files with instructions/text above the data
+            header_row = None
+            for row_idx in range(1, min(30, ws.max_row + 1)):
+                for col_idx in range(1, min(10, ws.max_column + 1)):
+                    cell_val = ws.cell(row=row_idx, column=col_idx).value
+                    if cell_val and "联交所参与者名称" in str(cell_val):
+                        header_row = row_idx
+                        self.header_row = header_row  # Store for reference
+                        break
+                if header_row:
+                    break
+
+            if not header_row:
+                self.add_error(0, "File", file_path,
+                              "Could not find header row with '联交所参与者名称'. Please ensure the Excel file contains the correct header row.")
+                return []
+
+            # Read data rows (skip header row and any empty rows)
+            rows = []
+            for row_idx in range(header_row + 1, ws.max_row + 1):
+                row_data = []
+                has_data = False
+                for col_idx in range(1, 43):  # 42 columns
+                    cell = ws.cell(row=row_idx, column=col_idx)
+                    val = str(cell.value) if cell.value is not None else ""
+                    row_data.append(val)
+                    if val and val != "None":
+                        has_data = True
+                if has_data:
+                    rows.append(row_data)
+
+            return rows
+
+        except ImportError:
+            self.add_error(0, "File", file_path,
+                          "openpyxl library required for Excel files. Install with: pip install openpyxl")
+            return []
+        except Exception as e:
+            self.add_error(0, "File", file_path, f"Error reading Excel file: {str(e)}")
+            return []
+
+    def generate_report(self) -> str:
+        """Generate a validation report"""
+        lines = []
+        lines.append("=" * 80)
+        lines.append("SSE Programmatic Trading Report Validation Results")
+        lines.append("沪股通投资者程序化交易信息报告表验证结果")
+        lines.append("=" * 80)
+        lines.append("")
+
+        errors = [e for e in self.errors if e.severity == Severity.ERROR]
+        warnings = [e for e in self.errors if e.severity == Severity.WARNING]
+
+        # Summary
+        total_rows = len(self.row_results)
+        valid_rows = len([r for r in self.row_results if r.is_valid])
+        invalid_rows = total_rows - valid_rows
+
+        lines.append(f"Total Rows Processed: {total_rows}")
+        lines.append(f"Valid Rows: {valid_rows}")
+        lines.append(f"Invalid Rows: {invalid_rows}")
+        lines.append(f"Total Errors: {len(errors)}")
+        lines.append(f"Total Warnings: {len(warnings)}")
+        lines.append("")
+
+        # Successful validations
+        if valid_rows > 0:
+            lines.append("-" * 80)
+            lines.append("SUCCESSFUL VALIDATIONS:")
+            lines.append("-" * 80)
+            for result in self.row_results:
+                if result.is_valid:
+                    context_parts = []
+                    if result.account_name:
+                        context_parts.append(result.account_name)
+                    if result.client_code:
+                        context_parts.append(f"BCAN: {result.client_code}")
+                    context = " - ".join(context_parts) if context_parts else "Row data"
+
+                    msg = f"✓ Row {result.row_num}: {context}"
+                    if result.warning_count > 0:
+                        msg += f" (with {result.warning_count} warning(s))"
+                    lines.append(msg)
+            lines.append("")
+
+        if errors:
+            lines.append("-" * 80)
+            lines.append("ERRORS:")
+            lines.append("-" * 80)
+            for e in errors:
+                lines.append(str(e))
+            lines.append("")
+
+        if warnings:
+            lines.append("-" * 80)
+            lines.append("WARNINGS:")
+            lines.append("-" * 80)
+            for w in warnings:
+                lines.append(str(w))
+            lines.append("")
+
+        if not errors and not warnings:
+            lines.append("=" * 80)
+            lines.append("✓ ALL VALIDATIONS PASSED!")
+            lines.append("=" * 80)
+
+        return "\n".join(lines)
+
+
+def main():
+    """Main entry point"""
+    if len(sys.argv) < 2:
+        print("Usage: python chinatest.py <excel_file_path>")
+        print("       Only Excel files (.xlsx) are supported")
+        sys.exit(1)
+
+    file_path = sys.argv[1]
+    validator = SSEValidator()
+    is_valid, errors = validator.validate_file(file_path)
+
+    print(validator.generate_report())
+
+    sys.exit(0 if is_valid else 1)
+
+
+if __name__ == "__main__":
+    main()
