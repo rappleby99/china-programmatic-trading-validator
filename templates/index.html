@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSE Programmatic Trading Report Validator</title>
+    <title>Programmatic Trading Report Validator - SSE & SZSE</title>
     <style>
         * {
             margin: 0;
@@ -59,25 +59,25 @@
         .warning-box {
             background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
             border-left: 4px solid #F59E0B;
-            border-radius: 12px;
-            padding: 24px 28px;
-            margin-bottom: 32px;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
         .warning-box h3 {
             color: #92400E;
-            margin-bottom: 16px;
-            font-size: 1.125rem;
+            margin-bottom: 10px;
+            font-size: 1rem;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .warning-box h3::before {
             content: "⚠️";
-            font-size: 1.5rem;
+            font-size: 1.25rem;
         }
 
         .warning-box ul {
@@ -86,10 +86,10 @@
         }
 
         .warning-box li {
-            margin: 8px 0;
-            padding-left: 24px;
+            margin: 6px 0;
+            padding-left: 20px;
             position: relative;
-            font-size: 0.9375rem;
+            font-size: 0.875rem;
         }
 
         .warning-box li::before {
@@ -104,10 +104,58 @@
             font-weight: 600;
         }
 
+        .info-box {
+            background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+            border-left: 4px solid #3B82F6;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .info-box h3 {
+            color: #1E40AF;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box h3::before {
+            content: "ℹ️";
+            font-size: 1.25rem;
+        }
+
+        .info-box ul {
+            list-style: none;
+            color: #1E3A8A;
+        }
+
+        .info-box li {
+            margin: 6px 0;
+            padding-left: 20px;
+            position: relative;
+            font-size: 0.875rem;
+        }
+
+        .info-box li::before {
+            content: "•";
+            position: absolute;
+            left: 8px;
+            font-weight: bold;
+            color: #3B82F6;
+        }
+
+        .info-box strong {
+            font-weight: 600;
+        }
+
         .upload-section {
             background: white;
-            border-radius: 16px;
-            padding: 48px;
+            border-radius: 12px;
+            padding: 24px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
             margin-bottom: 32px;
             border: 1px solid #e2e8f0;
@@ -115,8 +163,8 @@
 
         .upload-area {
             border: 2px dashed #cbd5e1;
-            border-radius: 16px;
-            padding: 60px 20px;
+            border-radius: 12px;
+            padding: 32px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -137,27 +185,27 @@
         }
 
         .upload-icon {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            margin-bottom: 12px;
             opacity: 0.7;
         }
 
         .upload-area h3 {
             color: #0066FF;
-            font-size: 1.375rem;
-            margin-bottom: 12px;
+            font-size: 1.125rem;
+            margin-bottom: 8px;
             font-weight: 600;
         }
 
         .upload-area p {
             color: #64748b;
-            font-size: 0.9375rem;
-            line-height: 1.5;
+            font-size: 0.875rem;
+            line-height: 1.4;
         }
 
         .upload-area p:last-child {
-            margin-top: 8px;
-            font-size: 0.875rem;
+            margin-top: 6px;
+            font-size: 0.8125rem;
             color: #94a3b8;
         }
 
@@ -589,25 +637,25 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>SSE Programmatic Trading Report Validator</h1>
-            <h2>沪股通投资者程序化交易信息报告表验证工具</h2>
-            <p>Validate your Excel reports against SSE requirements</p>
+            <h1>Programmatic Trading Report Validator</h1>
+            <h2>程序化交易信息报告表验证工具</h2>
+            <p>Validate Excel reports for Shanghai Stock Exchange (SSE) and Shenzhen Stock Exchange (SZSE)</p>
         </div>
 
         <div class="warning-box">
-            <h3>Important Security Notice</h3>
+            <h3>Data Usage Warning</h3>
             <ul>
-                <li><strong>DO NOT upload files containing real client data or sensitive information</strong></li>
                 <li>This tool is for <strong>TESTING PURPOSES ONLY</strong></li>
-                <li>Uploaded files are processed in memory and <strong>NOT saved to disk</strong></li>
-                <li>Files are automatically deleted after validation</li>
-                <li>Use sanitized or test data only</li>
+                <li>Use sanitized / test data only. <strong>DO NOT upload real client information</strong></li>
+                <li>Uploaded files are processed in memory, no data is saved</li>
             </ul>
+        </div>
 
-            <h3 style="margin-top: 20px;">File Naming Requirements</h3>
+        <div class="info-box">
+            <h3>File Naming Requirements</h3>
             <ul>
                 <li><strong>Shanghai files:</strong> SH_PGTDRPT_&lt;FIRM_ID&gt;_&lt;YYYYMMDD&gt;.xlsx</li>
-                <li><strong>Shenzhen files:</strong> SZ_PGTDRPT_&lt;FIRM_ID&gt;_&lt;YYYYMMDD&gt;.xlsx <em>(not yet supported)</em></li>
+                <li><strong>Shenzhen files:</strong> SZ_PGTDRPT_&lt;FIRM_ID&gt;_&lt;YYYYMMDD&gt;.xlsx</li>
                 <li>FIRM_ID must be 5 digits with leading zeros (e.g., 09999)</li>
                 <li>Date format: YYYYMMDD (e.g., 20250805)</li>
             </ul>
@@ -849,10 +897,13 @@
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
 
-            // Generate filename with timestamp
+            // Generate filename with timestamp and exchange type
             const now = new Date();
             const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
-            const filename = `SSE_Validation_Report_${timestamp}.txt`;
+
+            // Get exchange type from the displayed data
+            const exchangeType = document.querySelector('.summary-card.exchange .exchange-abbr')?.textContent || 'Report';
+            const filename = `${exchangeType}_Validation_Report_${timestamp}.txt`;
 
             link.href = url;
             link.download = filename;
