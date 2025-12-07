@@ -3,6 +3,10 @@
 
 A validation tool for Shanghai Stock Exchange (SSE) and Shenzhen Stock Exchange (SZSE) programmatic trading reports, supporting both command-line and web-based validation.
 
+## 🌐 Live Demo
+
+**Try the web validator here**: [https://china-programmatic-trading-validator-production.up.railway.app/](https://china-programmatic-trading-validator-production.up.railway.app/)
+
 ---
 
 ## ⚠️ Disclaimer
