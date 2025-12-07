@@ -1,3 +1,43 @@
+"""
+China Programmatic Trading Report Validator
+程序化交易信息报告表验证工具
+
+A validation tool for Shanghai Stock Exchange (SSE) and Shenzhen Stock Exchange (SZSE)
+programmatic trading reports, supporting both command-line and web-based validation.
+
+⚠️ DISCLAIMER
+
+This tool is provided "as is" for informational and educational purposes only.
+
+- No Guarantee of Accuracy: While care has been taken in developing this validator,
+  the author makes no representations or warranties regarding the accuracy, completeness,
+  or reliability of the validation logic.
+
+- No Affiliation: This tool is not affiliated with, endorsed by, or connected to the
+  Shanghai Stock Exchange, Shenzhen Stock Exchange, Hong Kong Stock Exchange, China
+  Securities Regulatory Commission, or any other regulatory authority or exchange.
+
+- Not for Compliance Testing: This tool should not be relied upon as a mechanism for
+  testing compliance with China/Hong Kong programmatic trading reporting requirements.
+
+- Official Testing Required: Users must engage in official testing with the Hong Kong
+  Stock Exchange and relevant regulatory authorities to ensure compliance.
+
+- No Liability: The author accepts no liability for any errors, omissions, or
+  consequences arising from the use of this tool.
+
+For official guidance, please refer to:
+- Hong Kong Stock Exchange (HKEX):
+  https://www.hkex.com.hk/Mutual-Market/Stock-Connect/Reference-Materials/Northbound-Program-Trading-Reporting?sc_lang=en
+- Shanghai Stock Exchange (SSE)
+- Shenzhen Stock Exchange (SZSE)
+- China Securities Regulatory Commission (CSRC)
+
+Developed with: Claude Sonnet 4.5 by Anthropic
+Last Updated: December 2025
+Version: 1.0
+"""
+
 import re
 import sys
 from dataclasses import dataclass, field

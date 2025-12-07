@@ -152,6 +152,249 @@
             font-weight: 600;
         }
 
+        .tab-navigation {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 12px 24px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            position: relative;
+            bottom: -2px;
+        }
+
+        .tab-btn:hover {
+            color: #0066FF;
+            background: #EFF6FF;
+        }
+
+        .tab-btn.active {
+            color: #0066FF;
+            border-bottom-color: #0066FF;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .mapping-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .mapping-subtitle {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+        .mapping-table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        .mapping-table {
+            width: max-content;
+            min-width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.8125rem;
+        }
+
+        .mapping-table thead {
+            background: linear-gradient(135deg, #0066FF 0%, #0052CC 100%);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .mapping-table th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid #0052CC;
+            color: white !important;
+            background: linear-gradient(135deg, #0066FF 0%, #0052CC 100%);
+        }
+
+        /* Frozen columns - first 4 columns stay fixed */
+        .mapping-table th:nth-child(1),
+        .mapping-table td:nth-child(1) {
+            position: sticky;
+            left: 0;
+            z-index: 50;
+        }
+
+        .mapping-table th:nth-child(2),
+        .mapping-table td:nth-child(2) {
+            position: sticky;
+            left: 50px;
+            z-index: 50;
+        }
+
+        .mapping-table th:nth-child(3),
+        .mapping-table td:nth-child(3) {
+            position: sticky;
+            left: 300px;
+            z-index: 50;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Ensure frozen column backgrounds are opaque */
+        .mapping-table tbody tr:nth-child(even) td:nth-child(1),
+        .mapping-table tbody tr:nth-child(even) td:nth-child(2),
+        .mapping-table tbody tr:nth-child(even) td:nth-child(3) {
+            background: #f8fafc;
+        }
+
+        .mapping-table tbody tr:nth-child(odd) td:nth-child(1),
+        .mapping-table tbody tr:nth-child(odd) td:nth-child(2),
+        .mapping-table tbody tr:nth-child(odd) td:nth-child(3) {
+            background: white;
+        }
+
+        .mapping-table tbody tr:hover td:nth-child(1),
+        .mapping-table tbody tr:hover td:nth-child(2),
+        .mapping-table tbody tr:hover td:nth-child(3) {
+            background: #EFF6FF;
+        }
+
+        /* Column 4 onwards are scrollable - no sticky positioning */
+
+        /* Ensure frozen column headers have proper background */
+        .mapping-table thead th:nth-child(1),
+        .mapping-table thead th:nth-child(2),
+        .mapping-table thead th:nth-child(3) {
+            z-index: 101;
+        }
+
+        /* Column widths - New order: #, CN Name, EN Name, CN Desc, EN Desc, Len, Type, Req, Cond, Values */
+        .mapping-table th:nth-child(1),
+        .mapping-table td:nth-child(1) { width: 50px; min-width: 50px; }
+        .mapping-table th:nth-child(2),
+        .mapping-table td:nth-child(2) { width: 250px; min-width: 250px; }
+        .mapping-table th:nth-child(3),
+        .mapping-table td:nth-child(3) { width: 200px; min-width: 200px; }
+        .mapping-table th:nth-child(4),
+        .mapping-table td:nth-child(4) { width: 450px; min-width: 450px; }
+        .mapping-table th:nth-child(5),
+        .mapping-table td:nth-child(5) { width: 400px; min-width: 400px; }
+        .mapping-table th:nth-child(6),
+        .mapping-table td:nth-child(6) { width: 100px; min-width: 100px; }
+        .mapping-table th:nth-child(7),
+        .mapping-table td:nth-child(7) { width: 120px; min-width: 120px; }
+        .mapping-table th:nth-child(8),
+        .mapping-table td:nth-child(8) { width: 180px; min-width: 180px; }
+        .mapping-table th:nth-child(9),
+        .mapping-table td:nth-child(9) { width: 300px; min-width: 300px; }
+        .mapping-table th:nth-child(10),
+        .mapping-table td:nth-child(10) { width: 375px; min-width: 375px; }
+
+        .mapping-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+
+        .mapping-table tbody tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        .mapping-table tbody tr:nth-child(odd) td {
+            background: white;
+        }
+
+        .mapping-table tbody tr:hover td {
+            background: #EFF6FF;
+        }
+
+        .mapping-table .field-num {
+            font-weight: 600;
+            color: #0066FF;
+            text-align: center;
+        }
+
+        .mapping-table .field-name-cn {
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .mapping-table .field-name-en {
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .mapping-table .field-desc-cn,
+        .mapping-table .field-desc-en {
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .mapping-table .field-required {
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .mapping-table .required-yes {
+            color: #DC2626;
+        }
+
+        .mapping-table .required-conditional {
+            color: #F59E0B;
+        }
+
+        .mapping-table .required-no {
+            color: #64748b;
+        }
+
+        .mapping-table .field-values {
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.75rem;
+            color: #334155;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+
+        .mapping-table .conditional-logic {
+            background: #FEF3C7;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+
+        .mapping-table .logic-formula {
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Consolas', monospace;
+            color: #92400E;
+            display: block;
+            margin-top: 4px;
+        }
+
         .upload-section {
             background: white;
             border-radius: 12px;
@@ -632,6 +875,86 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Disclaimer Section */
+        .disclaimer-section {
+            background: #f8f9fa;
+            border-top: 3px solid #e0e0e0;
+            margin-top: 60px;
+            padding: 40px 20px;
+            color: #495057;
+        }
+
+        .disclaimer-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .disclaimer-section h3 {
+            color: #2c3e50;
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .disclaimer-section h4 {
+            color: #34495e;
+            font-size: 1.1rem;
+            margin-top: 30px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .disclaimer-section p {
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .disclaimer-section ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 20px;
+        }
+
+        .disclaimer-section li {
+            padding: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .disclaimer-section li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #6c757d;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .disclaimer-section li strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .disclaimer-section a {
+            color: #2563eb;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-bottom-color 0.2s;
+        }
+
+        .disclaimer-section a:hover {
+            border-bottom-color: #2563eb;
+        }
+
+        .disclaimer-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
     </style>
 </head>
 <body>
@@ -642,6 +965,13 @@
             <p>Validate Excel reports for Shanghai Stock Exchange (SSE) and Shenzhen Stock Exchange (SZSE)</p>
         </div>
 
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('validation')">Validation Tool</button>
+            <button class="tab-btn" onclick="switchTab('shanghai')">Shanghai Mapping (SSE)</button>
+            <button class="tab-btn" onclick="switchTab('shenzhen')">Shenzhen Mapping (SZSE)</button>
+        </div>
+
+        <div id="validation-tab" class="tab-content active">
         <div class="warning-box">
             <h3>Data Usage Warning</h3>
             <ul>
@@ -692,6 +1022,59 @@
             <div class="button-group">
                 <button class="export-btn" onclick="exportReport()">📥 Export Report</button>
                 <button class="reset-btn" onclick="resetValidation()">Validate Another File</button>
+            </div>
+        </div>
+        </div>
+
+        <div id="shanghai-tab" class="tab-content">
+            <h2 class="mapping-title">Shanghai Stock Exchange (SSE) Field Mapping</h2>
+            <p class="mapping-subtitle">沪股通投资者程序化交易信息报告表字段说明 - 42 Fields</p>
+            <div class="mapping-table-container">
+                <table class="mapping-table">
+                    <thead>
+                        <tr>
+                            <th class="field-num">#</th>
+                            <th class="field-name-cn">Chinese Field Name</th>
+                            <th class="field-name-en">English Name</th>
+                            <th class="field-desc-cn">Chinese Description</th>
+                            <th class="field-desc-en">English Description</th>
+                            <th>Max Length</th>
+                            <th>Data Type</th>
+                            <th class="field-required">Required</th>
+                            <th>Conditional Logic</th>
+                            <th class="field-values">Valid Values</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shanghai-mapping-body">
+                        <!-- Data populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="shenzhen-tab" class="tab-content">
+            <h2 class="mapping-title">Shenzhen Stock Exchange (SZSE) Field Mapping</h2>
+            <p class="mapping-subtitle">深股通投资者程序化交易信息报告表字段说明 - 38 Fields</p>
+            <div class="mapping-table-container">
+                <table class="mapping-table">
+                    <thead>
+                        <tr>
+                            <th class="field-num">#</th>
+                            <th class="field-name-cn">Chinese Field Name</th>
+                            <th class="field-name-en">English Name</th>
+                            <th class="field-desc-cn">Chinese Description</th>
+                            <th class="field-desc-en">English Description</th>
+                            <th>Max Length</th>
+                            <th>Data Type</th>
+                            <th class="field-required">Required</th>
+                            <th>Conditional Logic</th>
+                            <th class="field-values">Valid Values</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shenzhen-mapping-body">
+                        <!-- Data populated by JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -925,6 +1308,271 @@
             fileInput.value = '';
             selectedFile = null;
         }
+
+        // Field mapping data for Shanghai (42 fields) - Complete with all 11 data points
+        const shanghaiFields = [
+            {num: 1, cn: "联交所参与者名称", descCn: "由上传《信息报告表》的联交所参与者填写公司全称。若上传《信息报告表》的联交所参与者与执行交易的联交所参与者不同，应当填写执行交易联交所参与者的公司全称。", en: "ep_name", descEn: "The exchange participant uploading the Information Report Form shall fill in the full company name. If the uploading participant differs from the executing participant, fill in the full name of the executing participant.", len: 100, type: "Text", req: "必填 (Mandatory)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 2, cn: "经纪商代码", descCn: "由上传《信息报告表》的联交所参与者填写联交所分配的经纪商代码。若上传《信息报告表》的联交所参与者与执行交易的联交所参与者不同，应当填写执行交易联交所参与者的经纪商代码。", en: "broker_code", descEn: "The uploading exchange participant shall fill in the broker code assigned by the exchange. If the uploading participant differs from the executing participant, fill in the broker code of the executing participant.", len: 5, type: "Text", req: "必填 (Mandatory)", cond: "", valuesCn: "必须与文件名FIRM_ID匹配", valuesEn: "Must match filename FIRM_ID"},
+            {num: 3, cn: "账户名称", descCn: "填写账户名称的全称，与券商客户编码及客户识别信息配对文件一致。", en: "account_name", descEn: "Fill in the full account name, consistent with the broker client code and client identification information pairing file.", len: 200, type: "Text", req: "必填 (Mandatory)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 4, cn: "证件号码", descCn: "填写投资者登记券商客户编码时的证件号码，例如机构投资者填写LEI码。该字段填写相同证件号码的机构账户，可以适用填报说明第二条第二款规定，选取一家联交所参与者集中填报资金信息。", en: "id_number", descEn: "Fill in the ID number used when the investor registered the broker client code, such as LEI code for institutional investors. Institutional accounts with the same ID number may select one exchange participant for consolidated fund reporting as specified in Section 2, Paragraph 2 of the instructions.", len: 80, type: "Text", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "", valuesEn: ""},
+            {num: 5, cn: "产品编码（选填）", descCn: "如为基金产品账户，可以填写该产品的产品编码。", en: "product_code", descEn: "If it is a fund product account, the product code may be filled in.", len: 50, type: "Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 6, cn: "券商客户编码", descCn: "填写联交所参与者向深股通程序化交易投资者编派的唯一券商客户编码。", en: "client_code", descEn: "Fill in the unique broker client code assigned by the exchange participant to the Shenzhen-Hong Kong Stock Connect programmatic trading investor.", len: 10, type: "Text", req: "必填 (Mandatory)", cond: "", valuesCn: "3-10个字符，文件内唯一", valuesEn: "3-10 characters, unique per file"},
+            {num: 7, cn: "产品管理机构名称", descCn: "如为产品账户，填写该产品管理机构全称。例如，资管产品账户填写该资管机构全称。", en: "fund_manager", descEn: "If it is a product account, fill in the full name of the product management institution. For example, for asset management product accounts, fill in the full name of the asset management institution.", len: 200, type: "Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 8, cn: "报告类型", descCn: "属于首次报告的，填写'首次'。属于报告信息发生重大变更情形的，填写'变更'。属于重大变更情形中'账户停止进行程序化交易'的，填写'停止使用'。报告类型为'变更'的，在发生变更的栏目填写变更后的信息，未发生变更的栏目填写原信息。报告类型为'停止使用'的，填写联交所参与者名称、经纪商代码、账户名称、券商客户编码、报告日期。", en: "report_type", descEn: "For initial reports, fill in 'Initial'. For reports involving major information changes, fill in 'Update'. For 'Account ceasing programmatic trading' (a type of major change), fill in 'Termination'. For 'Update' reports, fill in changed information in modified fields and original information in unchanged fields. For 'Termination' reports, fill in exchange participant name, broker code, account name, client code, and report date.", len: 6, type: "Enum", req: "必填 (Mandatory)", cond: "", valuesCn: "首次、变更、停止使用", valuesEn: "首次 (Initial), 变更 (Update), 停止使用 (Termination)"},
+            {num: 9, cn: "报告日期", descCn: "联交所参与者客户的报告日期填写联交所参与者客户向联交所参与者报告并经联交所参与者确认无误的日期，联交所参与者的报告日期填写其向联交所证券交易服务公司报告的日期。", en: "report_date", descEn: "For exchange participant clients, fill in the date when the client reported to the exchange participant and the participant confirmed it was correct. For exchange participants, fill in the date when they reported to the SEHK Securities Trading Service Company.", len: 8, type: "Date", req: "必填 (Mandatory)", cond: "", valuesCn: "不得晚于提交日期", valuesEn: "Cannot be later than submission date"},
+            {num: 10, cn: "是否选取一家联交所参与者集中填报资金信息", descCn: "机构投资者以同一证件号码在多家联交所参与者开立账户，选取一家联交所参与者集中填报账户资金信息相关字段的，填'是'；不适用的填'否'。", en: "consolidated_reporting", descEn: "If an institutional investor opens accounts with the same ID number at multiple exchange participants and selects one participant for consolidated fund reporting, fill in 'Yes'; otherwise fill in 'No'.", len: 1, type: "Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "是、否", valuesEn: "是 (Yes), 否 (No)"},
+            {num: 11, cn: "账户资金规模（人民币，万元）", descCn: "账户资金规模填写截至报告日期账户在深市股票、基金市场的持仓金额，以万元（人民币，下同）为单位。对于产品账户，资金规模、来源、占比均按产品维度进行填报。", en: "fund_size", descEn: "Fill in the account holdings amount in the Shenzhen stock and fund markets as of the report date, in units of 10,000 RMB. For product accounts, fund size, sources, and proportions are reported by product dimension.", len: 30, type: "Number", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "非负数，最多2位小数", valuesEn: "Non-negative, max 2 decimals"},
+            {num: 12, cn: "账户资金来源", descCn: "资金来源从下列选项中选择一项或者多项进行填写：（一）自有资金；（二）募集资金；（三）杠杆资金；（四）其他（填写具体来源）。不同资金来源之间用';'（英文分号）分隔，例如'自有资金;杠杆资金'。产品管理机构跟投产品的资金视为募集资金。", en: "fund_sources", descEn: "Select one or more from: (1) Own funds; (2) Raised funds; (3) Leveraged funds; (4) Other (specify source). Separate different sources with ';' (English semicolon), e.g., 'Own funds;Leveraged funds'. Funds from product managers co-investing are considered raised funds.", len: 30, type: "Multi-Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "自有资金、募集资金、杠杆资金、其他", valuesEn: "自有资金 (Own funds), 募集资金 (Raised funds), 杠杆资金 (Leveraged funds), 其他 (Other)"},
+            {num: 13, cn: "其他资金来源描述", descCn: "如资金来源包含'其他'，说明具体的资金来源。", en: "other_fund_desc", descEn: "If fund sources include 'Other', specify the specific fund source.", len: 200, type: "Text", req: "条件性 (Conditional)", cond: "Required if 'Other' in fund_sources", valuesCn: "", valuesEn: ""},
+            {num: 14, cn: "资金来源占比", descCn: "如为单一资金来源，资金来源占比填写'具体资金来源100%'，例如'自有资金 100%'；如存在多个资金来源，填写不同资金来源的占比，用';'（英文分号）分隔，例如'自有资金 30%;杠杆资金 70%'。", en: "fund_source_ratio", descEn: "For a single fund source, fill in 'Specific source 100%', e.g., 'Own funds 100%'. For multiple sources, fill in proportions separated by ';' (English semicolon), e.g., 'Own funds 30%;Leveraged funds 70%'.", len: 50, type: "Text", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "总和必须为100%", valuesEn: "Must sum to 100%"},
+            {num: 15, cn: "杠杆资金规模（人民币，万元）", descCn: "填写截至报告日期账户中配置于深市股票、基金市场的杠杆资金规模，以万元为单位。对于产品账户，杠杆资金规模按产品维度进行填报。杠杆资金包括客户通过融资融券、签订场外协议（例如收益互换等场外衍生品）等形式获取的实质性融资。", en: "leverage_size", descEn: "Fill in the size of leveraged funds allocated to Shenzhen stock and fund markets as of the report date, in units of 10,000 RMB. For product accounts, report by product dimension. Leveraged funds include substantial financing obtained through margin trading, OTC agreements (such as return swaps and other OTC derivatives), etc.", len: 30, type: "Number", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "无杠杆为0，有杠杆必须>0", valuesEn: "Must be 0 if no leverage, >0 if leverage exists"},
+            {num: 16, cn: "杠杆资金来源", descCn: "在下列选项中选择一项或者多项：（一）融资融券；（二）场外衍生品；（三）其他（填写具体方式，如个人借贷）。不同杠杆资金来源之间用';'（英文分号）分隔，例如'融资融券;场外衍生品'。对于产品账户，杠杆资金来源按产品维度进行填报。", en: "leverage_sources", descEn: "Select one or more from: (1) Margin trading; (2) OTC derivatives; (3) Other (specify method, such as personal loans). Separate different leverage sources with ';' (English semicolon), e.g., 'Margin trading;OTC derivatives'. For product accounts, report by product dimension.", len: 30, type: "Multi-Enum", req: "条件性 (Conditional)", cond: "Required if 'Leveraged funds' in fund_sources", valuesCn: "融资融券、场外衍生品、其他", valuesEn: "融资融券 (Margin trading), 场外衍生品 (OTC derivatives), 其他 (Other)"},
+            {num: 17, cn: "其他杠杆资金来源描述", descCn: "如杠杆资金来源包含'其他'，说明具体的杠杆资金来源。", en: "other_leverage_desc", descEn: "If leverage sources include 'Other', specify the specific leverage source.", len: 200, type: "Text", req: "条件性 (Conditional)", cond: "Required if 'Other' in leverage_sources", valuesCn: "", valuesEn: ""},
+            {num: 18, cn: "杠杆率（%）", descCn: "杠杆率填写截至报告日期账户中配置于深市股票、基金的总资产规模/净资产规模。对于产品账户，杠杆率按产品维度进行填报。对于为收益互换等场外衍生品客户提供对冲交易的集合账户，应当按其向场外衍生品客户收取的保证金总体比例认定杠杆率。", en: "leverage_ratio", descEn: "Fill in the leverage ratio as total assets/net assets allocated to Shenzhen stocks and funds as of the report date. For product accounts, report by product dimension. For collective accounts providing hedging for OTC derivatives clients, determine leverage based on overall margin ratio charged to OTC clients.", len: 20, type: "Number", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: ">=100、无杠杆=100、有杠杆>100", valuesEn: ">=100 (Minimum), =100 (No leverage), >100 (With leverage)"},
+            {num: 19, cn: "交易品种", descCn: "投资者根据自身交易的证券品种，填写'股票'或者'基金'，可以多选，用';'（英文分号）分隔，例如'股票;基金'。", en: "trading_products", descEn: "Based on the securities traded, fill in 'Stocks' or 'Funds', multiple selections allowed, separated by ';' (English semicolon), e.g., 'Stocks;Funds'.", len: 20, type: "Multi-Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "股票、基金", valuesEn: "股票 (Stocks), 基金 (Funds)"},
+            {num: 20, cn: "是否量化交易", descCn: "量化交易是指通过计算机程序按照设定的策略自动选择特定的证券和时机进行交易的一种程序化交易方式。深股通投资者结合自身交易实际情况判断是否属于量化交易，属于填'是'，不属于填'否'。", en: "is_quantitative", descEn: "Quantitative trading refers to programmatic trading that automatically selects specific securities and timing based on computer programs and set strategies. Shenzhen-Hong Kong Stock Connect investors determine based on their actual trading whether they engage in quantitative trading: fill in 'Yes' if applicable, 'No' otherwise.", len: 1, type: "Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "是、否", valuesEn: "是 (Yes), 否 (No)"},
+            {num: 21, cn: "主策略类型", descCn: "若'是否量化交易'填写'是'，则必填，否则可不填，只能填写以下一项：指数增强策略、市场中性策略、多空灵活策略、量化多头策略、管理期货策略CTA、参与新股发行策略、量化套利策略、日内回转策略、其他。", en: "main_strategy", descEn: "If 'Is Quantitative Trading' is 'Yes', then required, otherwise optional. Must fill in only one of the following: Index Enhancement Strategy, Market Neutral Strategy, Flexible Long-Short Strategy, Quantitative Long Strategy, CTA Managed Futures Strategy, IPO Participation Strategy, Quantitative Arbitrage Strategy, Intraday Reversal Strategy, Other.", len: 20, type: "Enum", req: "条件性 (Conditional)", cond: "Required if is_quantitative = 'Yes'", valuesCn: "指数增强策略、市场中性策略、多空灵活策略、量化多头策略、管理期货策略CTA、参与新股发行策略、量化套利策略、日内回转策略、其他", valuesEn: "指数增强策略 (Index enhancement), 市场中性策略 (Market neutral), 多空灵活策略 (Flexible long-short), 量化多头策略 (Quantitative long), 管理期货策略CTA (CTA), 参与新股发行策略 (IPO participation), 量化套利策略 (Quantitative arbitrage), 日内回转策略 (Intraday reversal), 其他 (Other)"},
+            {num: 22, cn: "其他主策略类型", descCn: "若'主策略类型'填写'其他'，则必填，否则可不填。", en: "other_main_strategy", descEn: "If 'Main Strategy Type' is filled as 'Other', then required, otherwise optional.", len: 200, type: "Text", req: "条件性 (Conditional)", cond: "Required if main_strategy = 'Other'", valuesCn: "", valuesEn: ""},
+            {num: 23, cn: "主策略概述", descCn: "若填写了'主策略类型'，则必填，否则可不填。", en: "main_strategy_desc", descEn: "If 'Main Strategy Type' is filled, then required, otherwise optional.", len: 500, type: "Text", req: "条件性 (Conditional)", cond: "Required if main_strategy is filled", valuesCn: "", valuesEn: ""},
+            {num: 24, cn: "辅策略类型", descCn: "非必填项，可填写以下任一项或最多两项，若两项中间用';'（英文分号）分隔：指数增强策略、市场中性策略、多空灵活策略、量化多头策略、管理期货策略CTA、参与新股发行策略、量化套利策略、日内回转策略、其他。", en: "sub_strategy", descEn: "Optional. May fill in one or up to two of the following, separated by ';' (English semicolon) if two: Index Enhancement Strategy, Market Neutral Strategy, Flexible Long-Short Strategy, Quantitative Long Strategy, CTA Managed Futures Strategy, IPO Participation Strategy, Quantitative Arbitrage Strategy, Intraday Reversal Strategy, Other.", len: 50, type: "Multi-Enum", req: "选填 (Optional)", cond: "", valuesCn: "指数增强策略、市场中性策略、多空灵活策略、量化多头策略、管理期货策略CTA、参与新股发行策略、量化套利策略、日内回转策略、其他", valuesEn: "指数增强策略 (Index enhancement), 市场中性策略 (Market neutral), 多空灵活策略 (Flexible long-short), 量化多头策略 (Quantitative long), 管理期货策略CTA (CTA), 参与新股发行策略 (IPO participation), 量化套利策略 (Quantitative arbitrage), 日内回转策略 (Intraday reversal), 其他 (Other)"},
+            {num: 25, cn: "其他辅策略类型", descCn: "若'辅策略类型'包含'其他'，则必填，否则可不填。", en: "other_sub_strategy", descEn: "If 'Sub-strategy Type' contains 'Other', then required, otherwise optional.", len: 200, type: "Text", req: "条件性 (Conditional)", cond: "Required if 'Other' in sub_strategy", valuesCn: "", valuesEn: ""},
+            {num: 26, cn: "辅策略概述", descCn: "若填写了'辅策略类型'，则必填，否则可不填。", en: "sub_strategy_desc", descEn: "If 'Sub-strategy Type' is filled, then required, otherwise optional.", len: 500, type: "Text", req: "条件性 (Conditional)", cond: "Required if sub_strategy is filled", valuesCn: "", valuesEn: ""},
+            {num: 27, cn: "期货市场账户名称（选填）", descCn: "选填。", en: "futures_account_name", descEn: "Optional.", len: 200, type: "Multi-Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 28, cn: "期货市场账户代码（选填）", descCn: "选填。", en: "futures_account_code", descEn: "Optional.", len: 300, type: "Multi-Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 29, cn: "交易指令执行方式", descCn: "若报告类型为'首次'或'变更'，则必填。填写以下任一项或多项，若多项中间用';'（英文分号）分隔：TWAP、VWAP、POV、其他。", en: "execution_method", descEn: "If Report Type is 'Initial' or 'Change', then required. Fill in one or more of the following, separated by ';' (English semicolon) if multiple: TWAP, VWAP, POV, Other.", len: 50, type: "Multi-Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "TWAP、VWAP、POV、其他", valuesEn: "TWAP, VWAP, POV, 其他 (Other)"},
+            {num: 30, cn: "其他方式描述", descCn: "若'交易指令执行方式'包含'其他'，则必填，否则可不填。", en: "other_execution_desc", descEn: "If 'Order Execution Method' contains 'Other', then required, otherwise optional.", len: 500, type: "Text", req: "条件性 (Conditional)", cond: "Required if 'Other' in execution_method", valuesCn: "", valuesEn: ""},
+            {num: 31, cn: "指令执行方式概述", descCn: "若报告类型为'首次'或'变更'，则必填。", en: "execution_desc", descEn: "If Report Type is 'Initial' or 'Change', then required.", len: 500, type: "Text", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "", valuesEn: ""},
+            {num: 32, cn: "账户最高申报速率", descCn: "若报告类型为'首次'或'变更'，则必填。填写以下任一项枚举值：500笔及以上、300笔至499笔、100笔至299笔、100笔以下。严格按上述选项填写，否则无法提交。例如账户最高申报速率为400笔/秒，则填写'300笔至499笔'。", en: "max_order_rate", descEn: "If Report Type is 'Initial' or 'Change', then required. Fill in one of the following enumerated values: 500+ orders, 300-499 orders, 100-299 orders, Below 100 orders. Must strictly follow the above options, otherwise submission will fail. For example, if account maximum order rate is 400 orders/second, fill in '300-499 orders'.", len: 20, type: "Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "500笔及以上、300笔至499笔、100笔至299笔、100笔以下", valuesEn: "500笔及以上 (500+), 300笔至499笔 (300-499), 100笔至299笔 (100-299), 100笔以下 (<100)"},
+            {num: 33, cn: "账户单日最高申报笔数", descCn: "若报告类型为'首次'或'变更'，则必填。填写以下任一项枚举值：25000笔及以上、20000笔至24999笔、15000笔至19999笔、10000笔至14999笔、10000笔以下。严格按上述选项填写，否则无法提交。例如账户单日最高申报笔数为30000笔/天，则填写'25000笔及以上'。", en: "max_daily_orders", descEn: "If Report Type is 'Initial' or 'Change', then required. Fill in one of the following enumerated values: 25000+ orders, 20000-24999 orders, 15000-19999 orders, 10000-14999 orders, Below 10000 orders. Must strictly follow the above options, otherwise submission will fail. For example, if account maximum daily orders is 30000 orders/day, fill in '25000+ orders'.", len: 20, type: "Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "25000笔及以上、20000笔至24999笔、15000笔至19999笔、10000笔至14999笔、10000笔以下", valuesEn: "25000笔及以上 (25000+), 20000笔至24999笔 (20000-24999), 15000笔至19999笔 (15000-19999), 10000笔至14999笔 (10000-14999), 10000笔以下 (<10000)"},
+            {num: 34, cn: "程序化交易软件名称及版本号", descCn: "若报告类型为'首次'或'变更'，则必填。涉及多个软件，用';'（英文分号）分隔。", en: "software_name", descEn: "If Report Type is 'Initial' or 'Change', then required. If multiple software involved, separate with ';' (English semicolon).", len: 200, type: "Multi-Text", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "", valuesEn: ""},
+            {num: 35, cn: "程序化交易软件开发主体", descCn: "若报告类型为'首次'或'变更'，则必填。涉及多个主体，用';'（英文分号）分隔。", en: "software_developer", descEn: "If Report Type is 'Initial' or 'Change', then required. If multiple developers involved, separate with ';' (English semicolon).", len: 200, type: "Multi-Text", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "", valuesEn: ""},
+            {num: 36, cn: "高频交易系统服务器所在地", descCn: "（1）填报的'账户最高申报速率'区间在每秒300笔以上，或者填报的'账户单日最高申报笔数'区间在20000笔以上，且不符合有关豁免要求的，须填写高频交易系统服务器所在地的具体地址。（2）符合《报告指引》第七条规定豁免情形的，在本字段填写'已申请豁免'。（3）账户最高申报速率或单日最高申报笔数未达到上述标准的，可不填。", en: "hft_server_location", descEn: "(1) If the reported 'Account Maximum Order Rate' interval is above 300 orders/second, or the reported 'Account Maximum Daily Orders' interval is above 20,000 orders, and does not meet the exemption requirements, must fill in the specific address of the high-frequency trading system server location. (2) If meeting the exemption circumstances specified in Article 7 of the Reporting Guidelines, fill in 'Exemption Applied' in this field. (3) If account maximum order rate or maximum daily orders do not reach the above standards, may leave blank.", len: 100, type: "Text", req: "条件性 (Conditional)", cond: "Required if high-frequency AND report_type in ['Initial','Update'] AND not exempt", valuesCn: "", valuesEn: ""},
+            {num: 37, cn: "联交所参与者联络人（选填）", descCn: "选填。", en: "ep_contact", descEn: "Optional.", len: 80, type: "Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 38, cn: "联交所参与者联络人联系方式（选填）", descCn: "选填。", en: "ep_contact_info", descEn: "Optional.", len: 80, type: "Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 39, cn: "投资者相关业务负责人（选填）", descCn: "选填。", en: "investor_contact", descEn: "Optional.", len: 80, type: "Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 40, cn: "投资者相关业务负责人联系方式（选填）", descCn: "选填。", en: "investor_contact_info", descEn: "Optional.", len: 80, type: "Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 41, cn: "是否上传测试报告及应急方案", descCn: "若报告类型为'首次'或'变更'，则必填。填写以下任一项：是、否、已申请豁免。（1）填报的'账户最高申报速率'区间在每秒300笔以上，或者填报的'账户单日最高申报笔数'区间在20000笔以上，且不符合有关豁免要求的，填写'是'并同步上传测试报告及应急方案。（2）符合《报告指引》第七条规定豁免情形的，在本字段填写'已申请豁免'。（3）不适用的填写'否'。", en: "upload_test_report", descEn: "If Report Type is 'Initial' or 'Change', then required. Fill in one of the following: Yes, No, Exemption Applied. (1) If the reported 'Account Maximum Order Rate' interval is above 300 orders/second, or the reported 'Account Maximum Daily Orders' interval is above 20,000 orders, and does not meet the exemption requirements, fill in 'Yes' and simultaneously upload test report and contingency plan. (2) If meeting the exemption circumstances specified in Article 7 of the Reporting Guidelines, fill in 'Exemption Applied' in this field. (3) If not applicable, fill in 'No'.", len: 5, type: "Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "是、否、已申请豁免", valuesEn: "是 (Yes), 否 (No), 已申请豁免 (Exemption applied)"},
+            {num: 42, cn: "合格境外投资者编码", descCn: "具有合格境外投资者资格的投资者拟适用拆单条款豁免高频额外报告的，则必填，否则可不填。", en: "qfii_code", descEn: "If investors with qualified foreign investor qualifications intend to apply the order-splitting clause to be exempt from additional high-frequency reporting, then required, otherwise optional.", len: 50, type: "Text", req: "条件性 (Conditional)", cond: "Required if QFII using order-splitting exemption AND report_type in ['Initial','Update']", valuesCn: "", valuesEn: ""}
+        ];
+
+        // Field mapping data for Shenzhen (38 fields)
+        const shenzhenFields = [
+            {num: 1, cn: "序号", descCn: "深圳交易所特有字段，用于标识记录序号", en: "sequence_num", descEn: "Shenzhen-specific field for record sequence numbering", len: 10, type: "Number", req: "选填 (Optional)", cond: "", valuesCn: "深圳交易所特有字段", valuesEn: "Shenzhen-specific field"},
+            {num: 2, cn: "联交所参与者名称", descCn: "由上传《信息报告表》的联交所参与者填写公司全称。若上传《信息报告表》的联交所参与者与执行交易的联交所参与者不同，应当填写执行交易联交所参与者的公司全称。", en: "ep_name", descEn: "The exchange participant uploading the Information Report Form shall fill in the full company name. If the uploading participant differs from the executing participant, fill in the full name of the executing participant.", len: 100, type: "Text", req: "必填 (Mandatory)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 3, cn: "经纪商代码", descCn: "由上传《信息报告表》的联交所参与者填写联交所分配的经纪商代码。若上传《信息报告表》的联交所参与者与执行交易的联交所参与者不同，应当填写执行交易联交所参与者的经纪商代码。", en: "broker_code", descEn: "The uploading exchange participant shall fill in the broker code assigned by the exchange. If the uploading participant differs from the executing participant, fill in the broker code of the executing participant.", len: 5, type: "Text", req: "必填 (Mandatory)", cond: "", valuesCn: "必须与文件名FIRM_ID匹配", valuesEn: "Must match filename FIRM_ID"},
+            {num: 4, cn: "账户名称", descCn: "填写账户名称的全称，与券商客户编码及客户识别信息配对文件一致。", en: "account_name", descEn: "Fill in the full account name, consistent with the broker client code and client identification information pairing file.", len: 200, type: "Text", req: "必填 (Mandatory)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 5, cn: "证件号码", descCn: "填写投资者登记券商客户编码时的证件号码，例如机构投资者填写LEI码。该字段填写相同证件号码的机构账户，可以适用填报说明第二条第二款规定，选取一家联交所参与者集中填报资金信息。", en: "id_number", descEn: "Fill in the ID number used when the investor registered the broker client code, such as LEI code for institutional investors. Institutional accounts with the same ID number may select one exchange participant for consolidated fund reporting as specified in Section 2, Paragraph 2 of the instructions.", len: 80, type: "Text", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "", valuesEn: ""},
+            {num: 6, cn: "产品编码（选填）", descCn: "如为基金产品账户，可以填写该产品的产品编码。", en: "product_code", descEn: "If it is a fund product account, the product code may be filled in.", len: 50, type: "Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 7, cn: "深市券商客户编码", descCn: "填写联交所参与者向深股通程序化交易投资者编派的唯一券商客户编码。", en: "client_code", descEn: "Fill in the unique broker client code assigned by the exchange participant to the Shenzhen-Hong Kong Stock Connect programmatic trading investor.", len: 10, type: "Text", req: "必填 (Mandatory)", cond: "", valuesCn: "3-10个字符，文件内唯一", valuesEn: "3-10 characters, unique per file"},
+            {num: 8, cn: "产品管理机构名称", descCn: "如为产品账户，填写该产品管理机构全称。例如，资管产品账户填写该资管机构全称。", en: "fund_manager", descEn: "If it is a product account, fill in the full name of the product management institution. For example, for asset management product accounts, fill in the full name of the asset management institution.", len: 200, type: "Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 9, cn: "报告类型（首次/变更/停止使用）", descCn: "属于首次报告的，填写'首次'。属于报告信息发生重大变更情形的，填写'变更'。属于重大变更情形中'账户停止进行程序化交易'的，填写'停止使用'。", en: "report_type", descEn: "For initial reports, fill in 'Initial'. For reports involving major information changes, fill in 'Update'. For 'Account ceasing programmatic trading' (a type of major change), fill in 'Termination'.", len: 6, type: "Enum", req: "必填 (Mandatory)", cond: "", valuesCn: "首次、变更、停止使用", valuesEn: "首次 (Initial), 变更 (Update), 停止使用 (Termination)"},
+            {num: 10, cn: "报告日期", descCn: "联交所参与者客户的报告日期填写联交所参与者客户向联交所参与者报告并经联交所参与者确认无误的日期，联交所参与者的报告日期填写其向联交所证券交易服务公司报告的日期。", en: "report_date", descEn: "For exchange participant clients, fill in the date when the client reported to the exchange participant and the participant confirmed it was correct. For exchange participants, fill in the date when they reported to the SEHK Securities Trading Service Company.", len: 8, type: "Date", req: "必填 (Mandatory)", cond: "", valuesCn: "不得晚于提交日期", valuesEn: "Cannot be later than submission date"},
+            {num: 11, cn: "是否选取一家联交所参与者集中填报资金信息", descCn: "机构投资者以同一证件号码在多家联交所参与者开立账户，选取一家联交所参与者集中填报账户资金信息相关字段的，填'是'；不适用的填'否'。", en: "consolidated_reporting", descEn: "If an institutional investor opens accounts with the same ID number at multiple exchange participants and selects one participant for consolidated fund reporting, fill in 'Yes'; otherwise fill in 'No'.", len: 1, type: "Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "是、否", valuesEn: "是 (Yes), 否 (No)"},
+            {num: 12, cn: "账户资金规模（人民币，万元）", descCn: "账户资金规模填写截至报告日期账户在深市股票、基金市场的持仓金额，以万元（人民币，下同）为单位。对于产品账户，资金规模、来源、占比均按产品维度进行填报。", en: "fund_size", descEn: "Fill in the account holdings amount in the Shenzhen stock and fund markets as of the report date, in units of 10,000 RMB. For product accounts, fund size, sources, and proportions are reported by product dimension.", len: 30, type: "Number", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "非负数，最多2位小数", valuesEn: "Non-negative, max 2 decimals"},
+            {num: 13, cn: "账户资金来源", descCn: "资金来源从下列选项中选择一项或者多项进行填写：（一）自有资金；（二）募集资金；（三）杠杆资金；（四）其他（填写具体来源）。不同资金来源之间用';'（英文分号）分隔，例如'自有资金;杠杆资金'。产品管理机构跟投产品的资金视为募集资金。", en: "fund_sources", descEn: "Select one or more from: (1) Own funds; (2) Raised funds; (3) Leveraged funds; (4) Other (specify source). Separate different sources with ';' (English semicolon), e.g., 'Own funds;Leveraged funds'. Funds from product managers co-investing are considered raised funds.", len: 30, type: "Multi-Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "自有资金、募集资金、杠杆资金、其他", valuesEn: "自有资金 (Own funds), 募集资金 (Raised funds), 杠杆资金 (Leveraged funds), 其他 (Other)"},
+            {num: 14, cn: "资金来源占比（%）", descCn: "如为单一资金来源，资金来源占比填写'具体资金来源100%'，例如'自有资金 100%'；如存在多个资金来源，填写不同资金来源的占比，用';'（英文分号）分隔，例如'自有资金 30%;杠杆资金 70%'。", en: "fund_source_ratio", descEn: "For a single fund source, fill in 'Specific source 100%', e.g., 'Own funds 100%'. For multiple sources, fill in proportions separated by ';' (English semicolon), e.g., 'Own funds 30%;Leveraged funds 70%'.", len: 50, type: "Text", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "总和必须为100%", valuesEn: "Must sum to 100%"},
+            {num: 15, cn: "杠杆资金规模（人民币，万元）", descCn: "填写截至报告日期账户中配置于深市股票、基金市场的杠杆资金规模，以万元为单位。对于产品账户，杠杆资金规模按产品维度进行填报。杠杆资金包括客户通过融资融券、签订场外协议（例如收益互换等场外衍生品）等形式获取的实质性融资。", en: "leverage_size", descEn: "Fill in the size of leveraged funds allocated to Shenzhen stock and fund markets as of the report date, in units of 10,000 RMB. For product accounts, report by product dimension. Leveraged funds include substantial financing obtained through margin trading, OTC agreements (such as return swaps and other OTC derivatives), etc.", len: 30, type: "Number", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "无杠杆为0，有杠杆必须>0", valuesEn: "Must be 0 if no leverage, >0 if leverage exists"},
+            {num: 16, cn: "杠杆资金来源", descCn: "在下列选项中选择一项或者多项：（一）融资融券；（二）场外衍生品；（三）其他（填写具体方式，如个人借贷）。不同杠杆资金来源之间用';'（英文分号）分隔，例如'融资融券;场外衍生品'。对于产品账户，杠杆资金来源按产品维度进行填报。", en: "leverage_sources", descEn: "Select one or more from: (1) Margin trading; (2) OTC derivatives; (3) Other (specify method, such as personal loans). Separate different leverage sources with ';' (English semicolon), e.g., 'Margin trading;OTC derivatives'. For product accounts, report by product dimension.", len: 30, type: "Multi-Enum", req: "条件性 (Conditional)", cond: "Required if 'Leveraged funds' in fund_sources", valuesCn: "融资融券、场外衍生品、其他", valuesEn: "融资融券 (Margin trading), 场外衍生品 (OTC derivatives), 其他 (Other)"},
+            {num: 17, cn: "杠杆率（%）", descCn: "杠杆率填写截至报告日期账户中配置于深市股票、基金的总资产规模/净资产规模。对于产品账户，杠杆率按产品维度进行填报。对于为收益互换等场外衍生品客户提供对冲交易的集合账户，应当按其向场外衍生品客户收取的保证金总体比例认定杠杆率。", en: "leverage_ratio", descEn: "Fill in the leverage ratio as total assets/net assets allocated to Shenzhen stocks and funds as of the report date. For product accounts, report by product dimension. For collective accounts providing hedging for OTC derivatives clients, determine leverage based on overall margin ratio charged to OTC clients.", len: 20, type: "Number", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: ">=100、无杠杆=100、有杠杆>100", valuesEn: ">=100 (Minimum), =100 (No leverage), >100 (With leverage)"},
+            {num: 18, cn: "交易品种", descCn: "投资者根据自身交易的证券品种，填写'股票'或者'基金'，可以多选，用';'（英文分号）分隔，例如'股票;基金'。", en: "trading_products", descEn: "Based on the securities traded, fill in 'Stocks' or 'Funds', multiple selections allowed, separated by ';' (English semicolon), e.g., 'Stocks;Funds'.", len: 20, type: "Multi-Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "股票、基金", valuesEn: "股票 (Stocks), 基金 (Funds)"},
+            {num: 19, cn: "是否量化交易", descCn: "量化交易是指通过计算机程序按照设定的策略自动选择特定的证券和时机进行交易的一种程序化交易方式。深股通投资者结合自身交易实际情况判断是否属于量化交易，属于填'是'，不属于填'否'。", en: "is_quantitative", descEn: "Quantitative trading refers to programmatic trading that automatically selects specific securities and timing based on computer programs and set strategies. Shenzhen-Hong Kong Stock Connect investors determine based on their actual trading whether they engage in quantitative trading: fill in 'Yes' if applicable, 'No' otherwise.", len: 1, type: "Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "是、否", valuesEn: "是 (Yes), 否 (No)"},
+            {num: 20, cn: "主策略类型", descCn: "账户使用的主要量化交易策略类型", en: "main_strategy", descEn: "Primary quantitative trading strategy type", len: 20, type: "Enum", req: "条件性 (Conditional)", cond: "Required if is_quantitative = 'Yes'", valuesCn: "指数增强策略、市场中性策略、多空灵活策略、量化多头策略、管理期货策略CTA、参与新股发行策略、量化套利策略、日内回转策略、其他", valuesEn: "指数增强策略 (Index enhancement), 市场中性策略 (Market neutral), 多空灵活策略 (Flexible long-short), 量化多头策略 (Quantitative long), 管理期货策略CTA (CTA), 参与新股发行策略 (IPO participation), 量化套利策略 (Quantitative arbitrage), 日内回转策略 (Intraday reversal), 其他 (Other)"},
+            {num: 21, cn: "主策略概述", descCn: "若'主策略类型'或者'辅策略类型'已填写，需要在'主策略概述'或者'辅策略概述'字段填写所采用策略的主要内容。", en: "main_strategy_desc", descEn: "If 'Main Strategy Type' or 'Sub-strategy Type' is filled in, need to fill in the main content of the strategy used in the 'Main Strategy Overview' or 'Sub-strategy Overview' field.", len: 500, type: "Text", req: "条件性 (Conditional)", cond: "Required if main_strategy is filled", valuesCn: "", valuesEn: ""},
+            {num: 22, cn: "辅策略类型", descCn: "除主策略外，该账户同时使用其他策略开展交易的，在下列选项中选择辅策略类型，辅策略类型最多选择2项，不同辅策略类型请用';'（英文分号）分隔。", en: "sub_strategy", descEn: "If the account uses other strategies in addition to the main strategy, select the sub-strategy types from the following options; maximum of 2 sub-strategy types, separate different sub-strategy types with ';' (English semicolon).", len: 50, type: "Multi-Enum", req: "选填 (Optional)", cond: "", valuesCn: "与主策略类型相同", valuesEn: "Same as main_strategy options"},
+            {num: 23, cn: "辅策略概述", descCn: "若'主策略类型'或者'辅策略类型'已填写，需要在'主策略概述'或者'辅策略概述'字段填写所采用策略的主要内容。", en: "sub_strategy_desc", descEn: "If 'Main Strategy Type' or 'Sub-strategy Type' is filled in, need to fill in the main content of the strategy used in the 'Main Strategy Overview' or 'Sub-strategy Overview' field.", len: 500, type: "Text", req: "条件性 (Conditional)", cond: "Required if sub_strategy is filled", valuesCn: "", valuesEn: ""},
+            {num: 24, cn: "期货市场账户名称（选填）", descCn: "可以填写期货（含期权）市场进行对冲的账户名称的全称。涉及多个账户的，用';'（英文分号）分隔。", en: "futures_account_name", descEn: "May fill in the full name of accounts used for hedging in futures (including options) markets. If multiple accounts are involved, separate with ';' (English semicolon).", len: 200, type: "Multi-Text", req: "选填 (Optional)", cond: "", valuesCn: "多个账户用分号分隔", valuesEn: "Multiple accounts separated by semicolons"},
+            {num: 25, cn: "期货市场账户代码（选填）", descCn: "可以填写期货（含期权）市场进行对冲的账户代码。涉及多个账户的，用';'（英文分号）分隔。", en: "futures_account_code", descEn: "May fill in account codes used for hedging in futures (including options) markets. If multiple accounts are involved, separate with ';' (English semicolon).", len: 300, type: "Multi-Text", req: "选填 (Optional)", cond: "", valuesCn: "多个代码用分号分隔", valuesEn: "Multiple codes separated by semicolons"},
+            {num: 26, cn: "交易指令执行方式", descCn: "账户通过算法交易等方式执行交易指令的，在下列选项中选择一项或者多项交易指令的具体执行方式，用';'（英文分号）分隔，例如'TWAP;VWAP'：（一）时间加权平均价格算法（TWAP）；（二）成交量加权平均价格算法（VWAP）；（三）比例成交算法（POV）；（四）其他方式，填写'其他方式（具体名称）'。", en: "execution_method", descEn: "If the account executes trading orders through algorithmic trading, select one or more specific execution methods from the following options, separated by ';' (English semicolon), e.g. 'TWAP;VWAP': (1) Time-weighted average price algorithm (TWAP); (2) Volume-weighted average price algorithm (VWAP); (3) Percentage of volume algorithm (POV); (4) Other methods, fill in 'Other methods (specific name)'.", len: 50, type: "Multi-Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "TWAP、VWAP、POV、其他", valuesEn: "TWAP, VWAP, POV, 其他 (Other)"},
+            {num: 27, cn: "交易指令执行方式概述", descCn: "'交易指令执行方式概述'字段填写所采用的交易指令执行方式的主要内容。", en: "execution_desc", descEn: "Fill in the main content of the trading order execution methods used in the 'Trading Order Execution Method Overview' field.", len: 500, type: "Text", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "", valuesEn: ""},
+            {num: 28, cn: "账户最高申报速率（笔/秒）", descCn: "投资者已经达到或者根据交易策略需求和系统情况综合预判可能达到的最高申报速率所在区间，在下列区间选择1项：（一）每秒申报笔数500笔及以上；（二）每秒申报笔数300笔至500笔（不含）；（三）每秒申报笔数100笔至300笔（不含）；（四）每秒申报笔数低于100笔。", en: "max_order_rate", descEn: "Select the interval for the maximum order submission rate that the investor has achieved or may achieve based on trading strategy requirements and system conditions: (1) 500 orders/second or above; (2) 300 to 500 orders/second (exclusive); (3) 100 to 300 orders/second (exclusive); (4) Below 100 orders/second.", len: 20, type: "Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "500笔及以上、300笔至499笔、100笔至299笔、100笔以下", valuesEn: "500笔及以上 (500+), 300笔至499笔 (300-499), 100笔至299笔 (100-299), 100笔以下 (<100)"},
+            {num: 29, cn: "账户单日最高申报笔数（笔）", descCn: "根据交易策略需求和系统情况综合预判可能达到或者曾经达到的单日最高申报笔数所在区间，在下列区间选择1项：（一）单日申报笔数25000笔及以上；（二）单日申报笔数20000笔至25000笔（不含）；（三）单日申报笔数15000笔至20000笔（不含）；（四）单日申报笔数10000笔至15000笔（不含）；（五）单日申报笔数低于10000笔。", en: "max_daily_orders", descEn: "Select the interval for the maximum daily order submissions that may be achieved or have been achieved based on trading strategy requirements and system conditions: (1) 25,000 orders/day or above; (2) 20,000 to 25,000 orders/day (exclusive); (3) 15,000 to 20,000 orders/day (exclusive); (4) 10,000 to 15,000 orders/day (exclusive); (5) Below 10,000 orders/day.", len: 20, type: "Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "25000笔及以上、20000笔至24999笔、15000笔至19999笔、10000笔至14999笔、10000笔以下", valuesEn: "25000笔及以上 (25000+), 20000笔至24999笔 (20000-24999), 15000笔至19999笔 (15000-19999), 10000笔至14999笔 (10000-14999), 10000笔以下 (<10000)"},
+            {num: 30, cn: "程序化交易软件名称及版本号", descCn: "填写程序化交易软件全称，涉及多个软件的，用';'（英文分号）分隔。", en: "software_name", descEn: "Fill in the full name of programmatic trading software; if multiple software are involved, separate with ';' (English semicolon).", len: 200, type: "Multi-Text", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "多个软件用分号分隔", valuesEn: "Multiple software separated by semicolons"},
+            {num: 31, cn: "程序化交易软件开发主体", descCn: "填写程序化交易软件开发主体全称，涉及多个主体的，用';'（英文分号）分隔。", en: "software_developer", descEn: "Fill in the full name of the programmatic trading software developer; if multiple developers are involved, separate with ';' (English semicolon).", len: 200, type: "Multi-Text", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "多个开发者用分号分隔", valuesEn: "Multiple developers separated by semicolons"},
+            {num: 32, cn: "高频交易系统服务器所在地", descCn: "填报的'账户最高申报速率'区间在每秒300笔以上，或者填报的'账户单日最高申报笔数'区间在20000笔以上，且不符合相关豁免要求的，须填写使用的高频交易系统服务器所在具体地址。符合《指引》第七条规定的豁免情形，在本字段填写'已申请豁免'。", en: "hft_server_location", descEn: "If the reported 'Account Maximum Order Rate' is above 300 orders/second, or 'Account Maximum Daily Orders' is above 20,000 orders, and does not qualify for exemption, must fill in the specific physical address of the HFT trading system server. If qualifying for exemption under Article 7 of the Guidelines, fill in 'Exemption applied' (已申请豁免).", len: 100, type: "Text", req: "条件性 (Conditional)", cond: "Required if high-frequency AND report_type in ['Initial','Update'] AND not exempt", valuesCn: "", valuesEn: ""},
+            {num: 33, cn: "联交所参与者联络人（选填）", descCn: "可以填写联交所参与者中负责填写、上传、维护《信息报告表》的负责人及其联系方式。", en: "ep_contact", descEn: "May fill in the person responsible for filling in, uploading, and maintaining the Information Report Form at the exchange participant and their contact information.", len: 80, type: "Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 34, cn: "联系方式（选填）", descCn: "可以填写联交所参与者中负责填写、上传、维护《信息报告表》的负责人及其联系方式。", en: "ep_contact_info", descEn: "May fill in the person responsible for filling in, uploading, and maintaining the Information Report Form at the exchange participant and their contact information.", len: 80, type: "Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 35, cn: "投资者相关业务负责人（选填）", descCn: "（一）联交所参与者客户。如为个人客户，可以填写本人及其联系方式；如为机构客户，可以填写机构程序化交易相关业务负责人及其联系方式。（二）从事自营或者资产管理等业务的联交所参与者。可以填写联交所参与者程序化交易相关业务负责人及其联系方式。", en: "investor_contact", descEn: "(1) Exchange participant clients: For individual clients, may fill in themselves and contact information; for institutional clients, may fill in the institutional programmatic trading business manager and contact information. (2) Exchange participants engaged in proprietary trading or asset management: May fill in the exchange participant's programmatic trading business manager and contact information.", len: 80, type: "Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 36, cn: "联系方式（选填）", descCn: "（一）联交所参与者客户。如为个人客户，可以填写本人及其联系方式；如为机构客户，可以填写机构程序化交易相关业务负责人及其联系方式。（二）从事自营或者资产管理等业务的联交所参与者。可以填写联交所参与者程序化交易相关业务负责人及其联系方式。", en: "investor_contact_info", descEn: "(1) Exchange participant clients: For individual clients, may fill in themselves and contact information; for institutional clients, may fill in the institutional programmatic trading business manager and contact information. (2) Exchange participants engaged in proprietary trading or asset management: May fill in the exchange participant's programmatic trading business manager and contact information.", len: 80, type: "Text", req: "选填 (Optional)", cond: "", valuesCn: "", valuesEn: ""},
+            {num: 37, cn: "是否提交测试报告及应急方案", descCn: "根据《指引》第七条要求提交了高频交易系统测试报告以及高频交易系统发生故障时的应急方案的，填'是'；符合《指引》第七条规定的豁免情形，在本字段填写'已申请豁免'；不适用的留空。", en: "upload_test_report", descEn: "If the HFT system test report and contingency plan for system failures have been submitted as required by Article 7 of the Guidelines, fill in 'Yes'; if qualifying for exemption under Article 7, fill in 'Exemption applied'; leave blank if not applicable.", len: 5, type: "Enum", req: "条件性 (Conditional)", cond: "Required if report_type in ['Initial','Update']", valuesCn: "是、否、已申请豁免", valuesEn: "是 (Yes), 否 (No), 已申请豁免 (Exemption applied)"},
+            {num: 38, cn: "合格境外投资者编码", descCn: "具有合格境外投资者资格的深股通程序化交易投资者以减少大额订单对市场冲击或者保障不同投资组合交易公平性为目的，仅在交易环节按照设定的拆单算法自动执行交易指令，填报的'账户最高申报速率'区间在每秒300笔以上，或者填报的'账户单日最高申报笔数'区间在20000笔以上，可以不额外报告程序化交易报告系统服务器所在地、系统测试报告与应急方案，但须在该字段填写中国证监会分配的合格境外投资者编码。", en: "qfii_code", descEn: "Qualified foreign investors with QFII status who, for the purpose of reducing market impact of large orders or ensuring fairness in trading different portfolios, only automatically execute trading orders through order-splitting algorithms at the trading stage, and whose reported 'Account Maximum Order Rate' is above 300 orders/second or 'Account Maximum Daily Orders' is above 20,000 orders, may be exempted from additionally reporting the programmatic trading system server location, system test reports and contingency plans, but must fill in the QFII code assigned by the CSRC in this field.", len: 50, type: "Text", req: "条件性 (Conditional)", cond: "Required if high-frequency + upload_test_report='No' AND report_type in ['Initial','Update']", valuesCn: "QFII使用拆单豁免时填写", valuesEn: "Fill when QFII using order-splitting exemption"}
+        ];
+
+        function populateShanghaiMapping() {
+            const tbody = document.getElementById('shanghai-mapping-body');
+            tbody.innerHTML = shanghaiFields.map(f => {
+                let values = '-';
+                if (f.valuesCn || f.valuesEn) {
+                    // Check if valuesEn already contains Chinese (format: "中文 (English)")
+                    if (f.valuesEn && f.valuesEn.includes('(') && /[\u4e00-\u9fa5]/.test(f.valuesEn)) {
+                        // Already combined format, just split by comma and put each on new line
+                        values = f.valuesEn.split(', ').join('\n');
+                    } else {
+                        const cnValues = f.valuesCn ? f.valuesCn.split('、') : [];
+                        const enValues = f.valuesEn ? f.valuesEn.split(', ') : [];
+
+                        if (cnValues.length > 0 && enValues.length > 0) {
+                            values = cnValues.map((cn, idx) => {
+                                const en = enValues[idx] || '';
+                                return `${cn} (${en})`;
+                            }).join('\n');
+                        } else if (f.valuesCn) {
+                            values = f.valuesCn.replace(/、/g, '\n');
+                        } else if (f.valuesEn) {
+                            values = f.valuesEn.replace(/, /g, '\n');
+                        }
+                    }
+                }
+
+                return `
+                <tr>
+                    <td class="field-num">${f.num}</td>
+                    <td class="field-name-cn">${f.cn}</td>
+                    <td class="field-name-en">${f.en}</td>
+                    <td class="field-desc-cn">${f.descCn || '-'}</td>
+                    <td class="field-desc-en">${f.descEn || '-'}</td>
+                    <td>${f.len}</td>
+                    <td>${f.type}</td>
+                    <td class="field-required ${f.req.includes('必填') ? 'required-yes' : f.req.includes('条件性') ? 'required-conditional' : 'required-no'}">${f.req}</td>
+                    <td>${f.cond ? `<div class="conditional-logic">${f.cond}</div>` : '-'}</td>
+                    <td class="field-values">${values}</td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function populateShenzhenMapping() {
+            const tbody = document.getElementById('shenzhen-mapping-body');
+            tbody.innerHTML = shenzhenFields.map(f => {
+                let values = '-';
+                if (f.valuesCn || f.valuesEn) {
+                    // Check if valuesEn already contains Chinese (format: "中文 (English)")
+                    if (f.valuesEn && f.valuesEn.includes('(') && /[\u4e00-\u9fa5]/.test(f.valuesEn)) {
+                        // Already combined format, just split by comma and put each on new line
+                        values = f.valuesEn.split(', ').join('\n');
+                    } else {
+                        const cnValues = f.valuesCn ? f.valuesCn.split('、') : [];
+                        const enValues = f.valuesEn ? f.valuesEn.split(', ') : [];
+
+                        if (cnValues.length > 0 && enValues.length > 0) {
+                            values = cnValues.map((cn, idx) => {
+                                const en = enValues[idx] || '';
+                                return `${cn} (${en})`;
+                            }).join('\n');
+                        } else if (f.valuesCn) {
+                            values = f.valuesCn.replace(/、/g, '\n');
+                        } else if (f.valuesEn) {
+                            values = f.valuesEn.replace(/, /g, '\n');
+                        }
+                    }
+                }
+
+                return `
+                <tr>
+                    <td class="field-num">${f.num}</td>
+                    <td class="field-name-cn">${f.cn}</td>
+                    <td class="field-name-en">${f.en}</td>
+                    <td class="field-desc-cn">${f.descCn || '-'}</td>
+                    <td class="field-desc-en">${f.descEn || '-'}</td>
+                    <td>${f.len}</td>
+                    <td>${f.type}</td>
+                    <td class="field-required ${f.req.includes('必填') ? 'required-yes' : f.req.includes('条件性') ? 'required-conditional' : 'required-no'}">${f.req}</td>
+                    <td>${f.cond ? `<div class="conditional-logic">${f.cond}</div>` : '-'}</td>
+                    <td class="field-values">${values}</td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+
+            // Set active button
+            event.target.classList.add('active');
+        }
+
+        // Populate field mapping tables on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            populateShanghaiMapping();
+            populateShenzhenMapping();
+        });
     </script>
+
+    <!-- Disclaimer Section -->
+    <div class="disclaimer-section">
+        <div class="disclaimer-container">
+            <h3>About This Tool</h3>
+            <p>
+                This page was created as an AI experiment developed using Claude Sonnet 4.5.
+                The primary objective was to extract and convert multiple Chinese specification
+                documents into a unified set of English validation rules for programmatic trading reporting.
+            </p>
+
+            <h4>Disclaimer</h4>
+            <p><strong>This tool is provided "as is" for informational and educational purposes only.</strong></p>
+
+            <ul>
+                <li>
+                    <strong>No Guarantee of Accuracy:</strong> While care has been taken in developing
+                    this validator, the author makes no representations or warranties regarding the
+                    accuracy, completeness, or reliability of the validation logic.
+                </li>
+                <li>
+                    <strong>No Affiliation:</strong> This tool is <strong>not affiliated with, endorsed by,
+                    or connected to</strong> the Shanghai Stock Exchange, Shenzhen Stock Exchange,
+                    Hong Kong Stock Exchange, China Securities Regulatory Commission, or any other
+                    regulatory authority or exchange.
+                </li>
+                <li>
+                    <strong>Not for Compliance Testing:</strong> This site should <strong>not be relied upon</strong>
+                    as a mechanism for testing compliance with China/Hong Kong programmatic trading
+                    reporting requirements.
+                </li>
+                <li>
+                    <strong>Official Testing Required:</strong> Users must engage in official testing with
+                    the <strong>Hong Kong Stock Exchange</strong> and relevant regulatory authorities
+                    to ensure compliance.
+                </li>
+                <li>
+                    <strong>No Liability:</strong> The author accepts no liability for any errors, omissions,
+                    or consequences arising from the use of this tool.
+                </li>
+            </ul>
+
+            <h4>For Official Guidance</h4>
+            <p>Please refer to official documentation from:</p>
+            <ul>
+                <li>
+                    <strong>Hong Kong Stock Exchange (HKEX):</strong>
+                    <a href="https://www.hkex.com.hk/Mutual-Market/Stock-Connect/Reference-Materials/Northbound-Program-Trading-Reporting?sc_lang=en"
+                       target="_blank" rel="noopener noreferrer">
+                        Northbound Program Trading Reporting
+                    </a>
+                </li>
+                <li>Shanghai Stock Exchange (SSE)</li>
+                <li>Shenzhen Stock Exchange (SZSE)</li>
+                <li>China Securities Regulatory Commission (CSRC)</li>
+            </ul>
+
+            <div class="disclaimer-footer">
+                <p>
+                    <strong>Developed with:</strong> Claude Sonnet 4.5 by Anthropic<br>
+                    <strong>Last Updated:</strong> December 2025
+                </p>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
