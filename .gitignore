@@ -45,6 +45,7 @@ instance/
 # Documentation and test files
 *.md
 !README.md
+!claude.md
 *.xlsx
 *.xls
 *.docx
